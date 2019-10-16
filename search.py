@@ -137,6 +137,44 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+def depthLimitedSearch(problem, limit):
+    return recursiveDepthLimitedSearch(Node(problem.getStartState(), None, None, 0), problem, limit);
+
+def recursiveDepthLimitedSearch(currentNode, problem, limit):
+    # if we reached the goal
+    if problem.goalTest(currentNode.state):
+        # then return the list of actions needed to get to this state
+        print('goal found!');
+        position, path, totalCost = currentNode, [], 0
+        while position.parent:
+            path.append(position.action)
+            totalCost += position.path_cost
+            position = position.parent
+        print(path, totalCost)
+        return path
+    # else check if we need to increase the limit and start over
+    elif limit == 0:
+        # we didn't find a path so return the cutoff val
+        return []
+    # otherwise iterate through all possible actions from currentNode
+    else:
+        cutoffOcurred = False
+        
+        print('current possible actions')
+        print(problem.getActions(currentNode.state))
+        
+        for action in problem.getActions(currentNode.state):
+            child = Node(problem.getResult(currentNode.state, action), currentNode, action, problem.getCost(currentNode.state, action))
+            print(child.state, child.parent, child.action, child.path_cost)
+            result = recursiveDepthLimitedSearch(child, problem, limit - 1)
+            if result == []:
+                cutoffOcurred = True
+            else:
+                return result
+        if cutoffOcurred:
+            return []
+            
+            
 def iterativeDeepeningSearch(problem):
     """
     Perform DFS with increasingly larger depth. Begin with a depth of 1 and increment depth by 1 at every step.
@@ -158,8 +196,15 @@ def iterativeDeepeningSearch(problem):
 
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.goalTest(problem.getStartState()))
+    print("Actions from start state:", problem.getActions(problem.getStartState()))
 
+    for limit in range(3):
+        result = depthLimitedSearch(problem, limit)
+        if result != []:
+            return result
+    
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
