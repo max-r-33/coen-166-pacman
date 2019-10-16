@@ -147,7 +147,7 @@ def recursiveDepthLimitedSearch(currentNode, problem, limit):
         print('goal found!');
         position, path, totalCost = currentNode, [], 0
         while position.parent:
-            path.append(position.action)
+            path.insert(0, position.action)
             totalCost += position.path_cost
             position = position.parent
         print(path, totalCost)
@@ -160,8 +160,8 @@ def recursiveDepthLimitedSearch(currentNode, problem, limit):
     else:
         cutoffOcurred = False
         
-        print('current possible actions')
-        print(problem.getActions(currentNode.state))
+        # print('current possible actions')
+        # print(problem.getActions(currentNode.state))
         
         for action in problem.getActions(currentNode.state):
             child = Node(problem.getResult(currentNode.state, action), currentNode, action, problem.getCost(currentNode.state, action))
@@ -195,12 +195,9 @@ def iterativeDeepeningSearch(problem):
     by calling problem.getCost(problem.getStartState(), one_of_the_actions)
 
     """
-    "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.goalTest(problem.getStartState()))
-    print("Actions from start state:", problem.getActions(problem.getStartState()))
 
-    for limit in range(3):
+    for limit in range(1000000):
+        print('depth: ', limit)
         result = depthLimitedSearch(problem, limit)
         if result != []:
             return result
