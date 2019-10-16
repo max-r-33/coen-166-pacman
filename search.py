@@ -138,66 +138,41 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def depthLimitedSearch(problem, limit):
-    return recursiveDepthLimitedSearch(Node(problem.getStartState(), None, None, 0), problem, limit);
+    return recursiveDepthLimitedSearch(Node(problem.getStartState(), None, None, 0), problem, limit, []);
 
-def recursiveDepthLimitedSearch(currentNode, problem, limit):
-    # if we reached the goal
+def recursiveDepthLimitedSearch(currentNode, problem, limit, nodeList):
     if problem.goalTest(currentNode.state):
-        # then return the list of actions needed to get to this state
-        print('goal found!');
+        # if we reached the goal then return the list of actions needed to get to this state
         position, path, totalCost = currentNode, [], 0
         while position.parent:
             path.insert(0, position.action)
             totalCost += position.path_cost
             position = position.parent
-        print(path, totalCost)
         return path
-    # else check if we need to increase the limit and start over
     elif limit == 0:
-        # we didn't find a path so return the cutoff val
+        # we didn't find a path within this limit so return the cutoff val
         return []
-    # otherwise iterate through all possible actions from currentNode
     else:
+        # otherwise iterate through all possible actions from currentNode
         cutoffOcurred = False
-        
-        # print('current possible actions')
-        # print(problem.getActions(currentNode.state))
-        
         for action in problem.getActions(currentNode.state):
             child = Node(problem.getResult(currentNode.state, action), currentNode, action, problem.getCost(currentNode.state, action))
-            print(child.state, child.parent, child.action, child.path_cost)
-            result = recursiveDepthLimitedSearch(child, problem, limit - 1)
-            if result == []:
-                cutoffOcurred = True
-            else:
-                return result
+            # print(child.state, child.parent, child.action, child.path_cost)
+            if child not in nodeList:
+                nodeList.append(child)
+                result = recursiveDepthLimitedSearch(child, problem, limit - 1, nodeList)
+                if result == []:
+                    cutoffOcurred = True
+                elif result != -1:
+                    return result
         if cutoffOcurred:
             return []
+        else:
+            return -1
             
             
 def iterativeDeepeningSearch(problem):
-    """
-    Perform DFS with increasingly larger depth. Begin with a depth of 1 and increment depth by 1 at every step.
-
-    Your search algorithm needs to return a list of actions that reaches the
-    goal. Make sure to implement a graph search algorithm.
-
-    To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.goalTest(problem.getStartState()))
-    print("Actions from start state:", problem.getActions(problem.getStartState()))
-
-    Then try to print the resulting state for one of those actions
-    by calling problem.getResult(problem.getStartState(), one_of_the_actions)
-    or the resulting cost for one of these actions
-    by calling problem.getCost(problem.getStartState(), one_of_the_actions)
-
-    """
-
     for limit in range(1000000):
-        print('depth: ', limit)
         result = depthLimitedSearch(problem, limit)
         if result != []:
             return result
