@@ -141,7 +141,7 @@ def nullHeuristic(state, problem=None):
 Function that calls the recursive DLS function with default inputs
 """
 def depthLimitedSearch(problem, limit):
-    return recursiveDepthLimitedSearch(Node(problem.getStartState(), None, None, 0), problem, limit, []);
+    return recursiveDepthLimitedSearch(Node(problem.getStartState(), None, None, 0), problem, limit, [])
 
 """
 Recursive function that builds the graph from choices made using the Node data structure from our selected path.
