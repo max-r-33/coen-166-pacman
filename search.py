@@ -163,7 +163,6 @@ def recursiveDepthLimitedSearch(currentNode, problem, limit, nodeList):
         cutoffOcurred = False
         for action in problem.getActions(currentNode.state):
             child = Node(problem.getResult(currentNode.state, action), currentNode, action, problem.getCost(currentNode.state, action))
-            # print(child.state, child.parent, child.action, child.path_cost)
             if child not in nodeList:
                 nodeList.append(child)
                 result = recursiveDepthLimitedSearch(child, problem, limit - 1, nodeList)
@@ -185,10 +184,45 @@ def iterativeDeepeningSearch(problem):
         if result != []:
             return result
     
+
+"""
+Function that finds pacman solutions using the A* search method
+"""
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # the nodes we've expanded
+    visited = []
+
+    # all nodes we could possibly expand
+    frontier = util.PriorityQueue()
+    
+    # every node is added here as soon as it is created so we know when we don't need to expand it
+    seenNodes = []
+
+    # creating the starting node
+    curr = Node(problem.getStartState(), None, None, 0)
+    visited.append(curr)
+    
+    while problem.goalTest(curr.state) == False:
+        # create a node for each possible action we could expand from our current position
+        actions = problem.getActions(curr.state)
+        for action in actions:
+            n = Node(problem.getResult(curr.state, action), curr, action, problem.getCost(curr.state, action))      
+            # if we haven't seen this node, calculate its f value and add/update it in the priority queue
+            if n not in seenNodes:
+                f = n.path_cost + heuristic(n.state, problem)
+                frontier.update(n, f)
+                seenNodes.append(n)
+        # pop the val with the lowest f from the frontier set
+        curr = frontier.pop()
+        visited.append(curr)
+        
+    # trace our path back from the end using the final current node
+    path = []
+    while curr.parent:
+        path.insert(0, curr.action)
+        curr = curr.parent
+    
+    return path
 
 # Abbreviations
 bfs = breadthFirstSearch
